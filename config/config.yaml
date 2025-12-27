@@ -1,0 +1,60 @@
+# Model Configuration
+model:
+  type: "yolo11"                    # Options: yolov8, yolov5, roboflow
+  weights_path: "models/yolo11n.pt" # Path to model weights
+  confidence: 0.3                   # Detection confidence threshold
+  iou: 0.7                          # IOU threshold for NMS
+  device: "cuda"                    # Options: cuda, cpu, mps (Mac)
+
+# Input Configuration
+input:
+  source_type: "video"              
+  video_path: r"data\input\videos\traffic_analysis_github_version.mov" 
+  webcam_id: 0                      
+  image_folder: "data/input/images/" 
+
+# Tracking Configuration
+tracking:
+  enabled: true
+  track_thresh: 0.25                # Tracking confidence threshold
+  track_buffer: 30                  # Frames to keep lost tracks
+  match_thresh: 0.8                 # IOU threshold for matching
+
+# Analysis Configuration
+analysis:
+  # Vehicle classes to detect (COCO dataset classes)
+  target_classes: [1, 2, 3, 5, 7]      # car, motorcycle, bus, truck
+  class_names:
+    1: "person"
+    2: "car"
+    3: "motorcycle"
+    5: "bus"
+    7: "truck"
+  
+  # Zone configuration (define counting zones)
+  zones:
+    - name: "entry_zone"
+      polygon: [[100, 500], [500, 500], [500, 600], [100, 600]]
+    - name: "exit_zone"
+      polygon: [[700, 500], [1100, 500], [1100, 600], [700, 600]]
+
+# Visualization Configuration
+visualization:
+  show_boxes: true                  # Draw bounding boxes
+  show_labels: true                 # Show class labels
+  show_tracks: true                 # Show tracking IDs
+  show_zones: true                  # Draw counting zones
+  show_trails: false                # Show vehicle trails
+  trail_length: 30                  # Trail history length
+  thickness: 2                      # Line thickness
+  font_scale: 0.6                   # Text size
+
+# Output Configuration
+output:
+  save_video: true
+  video_path: "data/output/videos/annotated_traffic.mp4"
+  save_json: true
+  json_path: "data/output/json/detections.json"
+  save_csv: true
+  csv_path: "data/output/csv/statistics.csv"
+  fps: 30                           # Output video FPS
