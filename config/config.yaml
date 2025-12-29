@@ -1,7 +1,7 @@
 # Model Configuration
 model:
-  type: "yolov8"                    # Options: yolov8, yolov5, roboflow
-  weights_path: "models/yolov8x.pt" # Path to model weights
+  type: "yolo11"                    # Options: yolov8, yolov5, roboflow
+  weights_path: "models/yolo11n.pt" # Path to model weights
   confidence: 0.3                   # Detection confidence threshold
   iou: 0.7                          # IOU threshold for NMS
   device: "cuda"                    # Options: cuda, cpu, mps (Mac)
