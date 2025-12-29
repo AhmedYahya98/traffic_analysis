@@ -1,7 +1,7 @@
 # Model Configuration
 model:
-  type: "yolo11"                    # Options: yolov8, yolov5, roboflow
-  weights_path: "models/yolo11n.pt" # Path to model weights
+  type: "yolov8"                    # Options: yolov8, yolov5, roboflow
+  weights_path: "models/yolov8x.pt" # Path to model weights
   confidence: 0.3                   # Detection confidence threshold
   iou: 0.7                          # IOU threshold for NMS
   device: "cuda"                    # Options: cuda, cpu, mps (Mac)
@@ -9,7 +9,7 @@ model:
 # Input Configuration
 input:
   source_type: "video"              
-  video_path: r"data\input\videos\traffic_analysis_github_version.mov" 
+  video_path: "C:\\Users\\roaay\\OneDrive\\Desktop\\traffic_analysis\\data\\input\\videos\\input.mp4" 
   webcam_id: 0                      
   image_folder: "data/input/images/" 
 
@@ -33,10 +33,15 @@ analysis:
   
   # Zone configuration (define counting zones)
   zones:
-    - name: "entry_zone"
-      polygon: [[100, 500], [500, 500], [500, 600], [100, 600]]
-    - name: "exit_zone"
-      polygon: [[700, 500], [1100, 500], [1100, 600], [700, 600]]
+    - name: "entry_zone_1"
+      polygon: [[783, 134], [833, 134], [833, 254], [783, 254]] # [top-left, top-right, bottom-right, bottom-left]
+    - name: "exit_zone_1"
+      polygon: [[440, 92], [527, 92], [527, 162], [440, 162]]
+    - name: "entry_zone_2"
+      polygon: [[447, 346], [520, 346], [520, 487], [447, 487]] # [top-left, top-right, bottom-right, bottom-left]
+    - name: "exit_zone_2"
+      polygon: [[717, 466], [827, 466], [827, 547], [717, 547]] # [top-left, top-right, bottom-right, bottom-left]
+
 
 # Visualization Configuration
 visualization:
@@ -44,7 +49,7 @@ visualization:
   show_labels: true                 # Show class labels
   show_tracks: true                 # Show tracking IDs
   show_zones: true                  # Draw counting zones
-  show_trails: false                # Show vehicle trails
+  show_trails: true                # Show vehicle trails
   trail_length: 30                  # Trail history length
   thickness: 2                      # Line thickness
   font_scale: 0.6                   # Text size

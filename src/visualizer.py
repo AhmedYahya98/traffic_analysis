@@ -47,15 +47,15 @@ class TrafficVisualizer:
         
         # Initialize Supervision annotators
         self.box_annotator = sv.BoxAnnotator(
-            thickness=thickness,
-            text_thickness=thickness,
-            text_scale=font_scale
-        )
-        
+             thickness=thickness
+)
+
         self.label_annotator = sv.LabelAnnotator(
             text_scale=font_scale,
             text_thickness=thickness
         )
+
+
         
         # Zone annotators (will be set when zones are provided)
         self.zone_annotators = []

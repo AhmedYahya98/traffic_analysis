@@ -52,15 +52,17 @@ class TrafficAnalyzer:
         """Initialize Supervision PolygonZone objects from zone definitions."""
         for zone_config in self.zones:
             polygon = np.array(zone_config['polygon'], dtype=np.int32)
+
             zone = sv.PolygonZone(
-                polygon=polygon,
-                frame_resolution_wh=(1920, 1080)  # Adjust based on your video
+                polygon=polygon
             )
+
             self.zone_objects.append({
                 'name': zone_config['name'],
                 'zone': zone,
                 'counter': defaultdict(int)
             })
+
         print(f"✓ Initialized {len(self.zone_objects)} counting zones")
     
     def update(self, detections: sv.Detections, frame_shape: Tuple[int, int]):

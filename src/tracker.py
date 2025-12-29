@@ -42,9 +42,9 @@ class VehicleTracker:
         
         # Initialize ByteTrack tracker from Supervision
         self.tracker = sv.ByteTrack(
-            track_thresh=track_thresh,
-            track_buffer=track_buffer,
-            match_thresh=match_thresh,
+            track_activation_threshold=track_thresh,
+            lost_track_buffer=track_buffer,
+            minimum_matching_threshold=match_thresh,
             frame_rate=frame_rate
         )
         
