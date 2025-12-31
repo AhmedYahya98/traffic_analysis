@@ -1,48 +1,19 @@
-"""
-Simple YOLO11n model trainer for traffic detection.
-No complexity - just train!
-"""
-
 from ultralytics import YOLO
 from pathlib import Path
 
 
-def train_yolo11n(
+def train_yolo(
     dataset_path: str,
+    model: str = "yolo11n.pt",
     epochs: int = 50,
+    patience: int = 10,
     batch_size: int = 16,
     device: str = "cpu"
 ):
-    """
-    Train YOLO11n model on your dataset - super simple!
     
-    Args:
-        dataset_path: Path to your dataset folder
-        epochs: How many times to go through the data (default: 50)
-        batch_size: How many images per batch (default: 16, reduce if out of memory)
-        device: "cpu" or "cuda" for GPU
-    
-    Your dataset should look like this:
-        dataset_path/
-        ├── train/
-        │   ├── images/
-        │   │   ├── img1.jpg
-        │   │   └── img2.jpg
-        │   └── labels/
-        │       ├── img1.txt
-        │       └── img2.txt
-        └── val/
-            ├── images/
-            └── labels/
-    
-    Label format (in .txt files):
-        class_id x_center y_center width height
-        Example: 0 0.5 0.5 0.3 0.4
-        (all values between 0 and 1)
-    """
     
     print("="*60)
-    print("Training YOLO11n Model")
+    print("Training YOLO Model")
     print("="*60)
     
     # Create data.yaml file
@@ -74,8 +45,8 @@ names: {list(range(num_classes))}
         print(f"✓ Created {data_yaml}")
     
     # Load YOLO11n model
-    print("\nLoading YOLO11n model...")
-    model = YOLO("yolo11n.pt")  # Will auto-download if needed
+    print("\nLoading YOLO model...")
+    model = YOLO(model)  # Will auto-download if needed
     print("✓ Model loaded")
     
     # Train
@@ -92,8 +63,8 @@ names: {list(range(num_classes))}
         imgsz=640,
         device=device,
         project="trained_models",
-        name="yolo11n_traffic",
-        patience=10,  # Stop early if no improvement
+        name="yolo_traffic",
+        patience=patience,  # Stop early if no improvement
         verbose=True
     )
     
@@ -101,7 +72,7 @@ names: {list(range(num_classes))}
     print("✅ Training Complete!")
     print("="*60)
     
-    best_model = Path("trained_models/yolo11n_traffic/weights/best.pt")
+    best_model = Path("trained_models/yolo_traffic/weights/best.pt")
     print(f"\n📦 Your trained model: {best_model}")
     print(f"\nTo use it, update config/config.yaml:")
     print(f'  weights_path: "{best_model}"')

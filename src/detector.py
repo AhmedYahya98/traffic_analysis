@@ -1,8 +1,3 @@
-"""
-Object detection module using YOLO models.
-Supports YOLOv8, YOLOv5, and Roboflow models.
-"""
-
 import cv2
 import numpy as np
 from typing import List, Optional
@@ -29,23 +24,19 @@ class VehicleDetector:
         Initialize the vehicle detector.
         
         Args:
-            model_path: Path to YOLO model weights (e.g., 'models/yolov8n.pt')
-            confidence: Minimum confidence threshold for detections (0-1)
-            iou: IOU threshold for Non-Maximum Suppression
-            device: Device to run inference on ('cuda', 'cpu', or 'mps')
-            target_classes: List of COCO class IDs to detect (e.g., [2, 3, 5, 7])
-                          Default is [2, 3, 5, 7] for car, motorcycle, bus, truck
-        
-        Note:
-            ⚠️ Make sure the model file exists at model_path before initialization
+            model_path: Path to YOLO model weights
+            confidence: Detection confidence threshold
+            iou: IOU threshold for NMS
+            device: Device to run inference on (cuda/cpu/mps)
+            target_classes: List of class indices to detect (from trained dataset)
         """
         self.model_path = Path(model_path)
         self.confidence = confidence
         self.iou = iou
         self.device = device
         
-        # Default to common vehicle classes if not specified
-        self.target_classes = target_classes or [2, 3, 5, 7]  # car, motorcycle, bus, truck
+        # Default to dataset2 vehicle classes (articulated-bus, bus, car, motorbike, truck)
+        self.target_classes = target_classes or [1, 2, 3, 5, 7]
         
         # Load the YOLO model
         self._load_model()
@@ -66,22 +57,6 @@ class VehicleDetector:
     def detect(self, frame: np.ndarray) -> sv.Detections:
         """
         Detect vehicles in a single frame.
-        
-        Args:
-            frame: Input image as numpy array (BGR format from OpenCV)
-        
-        Returns:
-            Supervision Detections object containing:
-                - xyxy: Bounding boxes in [x1, y1, x2, y2] format
-                - confidence: Detection confidence scores
-                - class_id: Class IDs for each detection
-                - tracker_id: (optional) Tracking IDs if tracking is enabled
-        
-        Example:
-            >>> detector = VehicleDetector("models/yolov8n.pt")
-            >>> frame = cv2.imread("traffic.jpg")
-            >>> detections = detector.detect(frame)
-            >>> print(f"Found {len(detections)} vehicles")
         """
         # Run YOLO inference
         results = self.model(
@@ -102,13 +77,7 @@ class VehicleDetector:
         Detect vehicles in multiple frames (batch processing).
         
         Args:
-            frames: List of input images
-        
-        Returns:
-            List of Detections objects, one per frame
-        
-        Note:
-            Batch processing can be faster for multiple frames but uses more memory
+            frames: List of input images        
         """
         all_detections = []
         
@@ -121,18 +90,17 @@ class VehicleDetector:
     def get_class_name(self, class_id: int) -> str:
         """
         Get the class name for a given class ID.
-        
-        Args:
-            class_id: COCO class ID
-        
-        Returns:
-            Human-readable class name
+        Uses dataset2 class mapping (8 classes).
         """
-        # COCO class names for vehicles
+        # Dataset2 class names (from data/dataset2/data.yaml)
         class_names = {
-            2: "car",
-            3: "motorcycle",
-            5: "bus",
+            0: "PMT",
+            1: "articulated-bus",
+            2: "bus",
+            3: "car",
+            4: "freight",
+            5: "motorbike",
+            6: "small-bus",
             7: "truck"
         }
-        return class_names.get(class_id, f"class_{class_id}")
+        return class_names.get(class_id, f"unknown_class_{class_id}")

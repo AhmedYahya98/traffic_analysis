@@ -1,8 +1,3 @@
-"""
-Visualization module for annotating frames with detection results.
-Creates visual overlays with bounding boxes, labels, zones, and statistics.
-"""
-
 import cv2
 import numpy as np
 from typing import Dict, List, Optional, Tuple
@@ -94,17 +89,7 @@ class TrafficVisualizer:
         Args:
             frame: Input frame to annotate
             detections: Detections to visualize
-            statistics: Optional statistics to display as overlay
-        
-        Returns:
-            Annotated frame
-        
-        The annotated frame includes:
-            - Bounding boxes around detected vehicles
-            - Class labels and confidence scores
-            - Tracking IDs (if tracking enabled)
-            - Counting zones (if configured)
-            - Statistics overlay (if provided)
+            statistics: Optional statistics to display as overlay        
         """
         annotated_frame = frame.copy()
         
@@ -138,15 +123,6 @@ class TrafficVisualizer:
         return annotated_frame
     
     def _create_labels(self, detections: sv.Detections) -> List[str]:
-        """
-        Create label strings for each detection.
-        
-        Args:
-            detections: Detections to create labels for
-        
-        Returns:
-            List of label strings
-        """
         labels = []
         
         for idx in range(len(detections)):

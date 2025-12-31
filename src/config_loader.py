@@ -1,8 +1,3 @@
-"""
-Configuration loader for the traffic analysis project.
-Handles loading and validating YAML configuration files.
-"""
-
 import yaml
 from pathlib import Path
 from typing import Dict, Any
@@ -55,11 +50,7 @@ class ConfigLoader:
             default: Default value if key not found
         
         Returns:
-            Configuration value or default
-        
-        Example:
-            >>> config = ConfigLoader()
-            >>> confidence = config.get('model.confidence', 0.5)
+            Configuration value or default        
         """
         keys = key_path.split('.')
         value = self.config

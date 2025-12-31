@@ -1,7 +1,7 @@
 # Model Configuration
 model:
   type: "yolo11"                    # Options: yolov8, yolov5, roboflow
-  weights_path: "models/yolo11n.pt" # Path to model weights
+  weights_path: "yolo11n.pt" # Path to model weights
   confidence: 0.3                   # Detection confidence threshold
   iou: 0.7                          # IOU threshold for NMS
   device: "cuda"                    # Options: cuda, cpu, mps (Mac)
@@ -9,7 +9,7 @@ model:
 # Input Configuration
 input:
   source_type: "video"              
-  video_path: "C:\\Users\\roaay\\OneDrive\\Desktop\\traffic_analysis\\data\\input\\videos\\input.mp4" 
+  video_path: "data/input/videos/input.mp4" # Path to input video file
   webcam_id: 0                      
   image_folder: "data/input/images/" 
 
@@ -22,13 +22,17 @@ tracking:
 
 # Analysis Configuration
 analysis:
-  # Vehicle classes to detect (COCO dataset classes)
-  target_classes: [1, 2, 3, 5, 7]      # car, motorcycle, bus, truck
+  # Vehicle classes to detect (from data/dataset2/data.yaml)
+  # Dataset2 classes: 0=PMT, 1=articulated-bus, 2=bus, 3=car, 4=freight, 5=motorbike, 6=small bus, 7=truck
+  target_classes: [1, 2, 3, 5, 7]      # articulated-bus, bus, car, motorbike, truck
   class_names:
-    1: "person"
-    2: "car"
-    3: "motorcycle"
-    5: "bus"
+    0: "PMT"
+    1: "articulated-bus"
+    2: "bus"
+    3: "car"
+    4: "freight"
+    5: "motorbike"
+    6: "small-bus"
     7: "truck"
   
   # Zone configuration (define counting zones)

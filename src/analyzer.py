@@ -1,8 +1,3 @@
-"""
-Traffic analysis module for counting and categorizing vehicles.
-Implements zone-based counting and statistics collection.
-"""
-
 import numpy as np
 from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
@@ -10,11 +5,6 @@ import supervision as sv
 
 
 class TrafficAnalyzer:
-    """
-    Analyze traffic patterns, count vehicles, and collect statistics.
-    Supports zone-based counting for entry/exit analysis.
-    """
-    
     def __init__(
         self,
         class_names: Dict[int, str],
@@ -24,8 +14,9 @@ class TrafficAnalyzer:
         Initialize the traffic analyzer.
         
         Args:
-            class_names: Mapping of class IDs to human-readable names
-                        Example: {2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
+            class_names: Mapping of class IDs to human-readable names.
+                        Must match dataset class indices (from config.yaml).
+                        Example: {0: "PMT", 1: "articulated-bus", 2: "bus", 3: "car", 4: "freight", 5: "motorbike", 6: "small-bus", 7: "truck"}
             zones: List of zone definitions for counting
                   Example: [{"name": "entry", "polygon": [[x1,y1], [x2,y2], ...]}]
         
@@ -60,7 +51,8 @@ class TrafficAnalyzer:
             self.zone_objects.append({
                 'name': zone_config['name'],
                 'zone': zone,
-                'counter': defaultdict(int)
+                'counter': defaultdict(int),
+                'tracker_in_zone': set()  # Track which vehicles have entered this zone
             })
 
         print(f"✓ Initialized {len(self.zone_objects)} counting zones")
@@ -72,11 +64,6 @@ class TrafficAnalyzer:
         Args:
             detections: Tracked detections from current frame
             frame_shape: (height, width) of the frame for zone resolution
-        
-        This method:
-            1. Counts total detections per class
-            2. Tracks unique vehicle IDs
-            3. Updates zone-based counts
         """
         # Update total counts per class
         for class_id in detections.class_id:
@@ -96,30 +83,36 @@ class TrafficAnalyzer:
             # Trigger zone counting
             mask = zone.trigger(detections)
             
-            # Count vehicles in zone by class
+            # Count vehicles in zone by class (only count once per unique vehicle)
             for idx, in_zone in enumerate(mask):
                 if in_zone:
-                    class_id = detections.class_id[idx]
-                    class_name = self.class_names.get(class_id, f"class_{class_id}")
-                    zone_obj['counter'][class_name] += 1
+                    tracker_id = None
+                    if hasattr(detections, 'tracker_id') and detections.tracker_id is not None:
+                        tracker_id = detections.tracker_id[idx]
+                    
+                    # Only count if this is a new entry to the zone
+                    if tracker_id is not None:
+                        if tracker_id not in zone_obj['tracker_in_zone']:
+                            class_id = detections.class_id[idx]
+                            class_name = self.class_names.get(class_id, f"unknown_class_{class_id}")
+                            zone_obj['counter'][class_name] += 1
+                            zone_obj['tracker_in_zone'].add(tracker_id)
+                    else:
+                        # Fallback if tracking is disabled (count every detection)
+                        class_id = detections.class_id[idx]
+                        class_name = self.class_names.get(class_id, f"unknown_class_{class_id}")
+                        zone_obj['counter'][class_name] += 1
+            
+            # Remove tracking IDs that are no longer in the zone
+            current_ids = set()
+            for idx, in_zone in enumerate(mask):
+                if in_zone and hasattr(detections, 'tracker_id') and detections.tracker_id is not None:
+                    current_ids.add(detections.tracker_id[idx])
+            zone_obj['tracker_in_zone'] &= current_ids  # Keep only IDs still in zone
     
     def get_statistics(self) -> Dict:
         """
-        Get comprehensive traffic statistics.
-        
-        Returns:
-            Dictionary containing:
-                - total_detections: Total number of detections
-                - unique_vehicles: Number of unique vehicles tracked
-                - class_counts: Counts per vehicle class
-                - unique_per_class: Unique vehicles per class
-                - zone_statistics: Per-zone counts (if zones configured)
-        
-        Example:
-            >>> analyzer = TrafficAnalyzer(class_names={2: "car", 3: "motorcycle"})
-            >>> # ... process frames ...
-            >>> stats = analyzer.get_statistics()
-            >>> print(f"Total vehicles: {stats['unique_vehicles']}")
+        Get comprehensive traffic statistics.        
         """
         stats = {
             'total_detections': sum(self.total_counts.values()),
@@ -146,8 +139,9 @@ class TrafficAnalyzer:
         self.class_wise_ids = defaultdict(set)
         self.zone_counts = defaultdict(lambda: defaultdict(int))
         
-        # Reset zone counters
+        # Reset zone counters and tracking state
         for zone_obj in self.zone_objects:
             zone_obj['counter'] = defaultdict(int)
+            zone_obj['tracker_in_zone'] = set()
         
         print("✓ Analyzer statistics reset")

@@ -1,8 +1,3 @@
-"""
-Export module for saving analysis results to various formats.
-Supports video, JSON, and CSV outputs.
-"""
-
 import cv2
 import json
 import pandas as pd
@@ -54,9 +49,7 @@ class ResultsExporter:
             frame_width: Width of output video
             frame_height: Height of output video
             fps: Frames per second for output video
-        
-        Note:
-            Call this before writing any frames
+
         """
         if not self.output_config.get('save_video', False):
             return

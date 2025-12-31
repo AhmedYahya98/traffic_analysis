@@ -1,8 +1,3 @@
-"""
-Multi-object tracking module using ByteTrack.
-Maintains consistent IDs for detected objects across frames.
-"""
-
 import numpy as np
 from typing import Optional
 import supervision as sv
@@ -53,23 +48,6 @@ class VehicleTracker:
     def update(self, detections: sv.Detections) -> sv.Detections:
         """
         Update tracks with new detections from current frame.
-        
-        Args:
-            detections: Detections from current frame (from detector)
-        
-        Returns:
-            Detections with tracker_id field added
-        
-        Note:
-            The returned detections will have a 'tracker_id' field containing
-            unique IDs for each tracked object. IDs persist across frames.
-        
-        Example:
-            >>> tracker = VehicleTracker()
-            >>> detections = detector.detect(frame)
-            >>> tracked_detections = tracker.update(detections)
-            >>> for det_id in tracked_detections.tracker_id:
-            >>>     print(f"Vehicle ID: {det_id}")
         """
         # Update tracker with new detections
         tracked_detections = self.tracker.update_with_detections(detections)
@@ -78,8 +56,7 @@ class VehicleTracker:
     
     def reset(self):
         """
-        Reset the tracker state.
-        Useful when switching to a new video or restarting analysis.
+        Reset the tracker state
         """
         self.tracker = sv.ByteTrack(
             track_thresh=self.track_thresh,
